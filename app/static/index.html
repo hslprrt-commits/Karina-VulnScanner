@@ -1,140 +1,323 @@
-cat > app/static/index.html <<'HTML'
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090b10">
-<title>Karina VulnScanner</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#090b10;color:#f3f4f6;font-family:Arial,sans-serif}
-header{padding:20px 5%;background:#11151e;border-bottom:1px solid #292d37}
-.brand{font-size:23px;font-weight:800}.brand span{color:#ff4057}
-main{max-width:1000px;width:92%;margin:32px auto}
-.panel,.card{background:#11151e;border:1px solid #292d37;border-radius:15px;padding:20px;margin-bottom:16px}
-h1{font-size:clamp(25px,5vw,36px)}p{color:#aab2c2;line-height:1.7}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-label{display:block;margin:14px 0 7px}
-input{width:100%;padding:12px;background:#090b10;color:white;border:1px solid #343b4b;border-radius:8px}
-button{width:100%;padding:12px;margin-top:12px;background:#f43f55;color:white;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.5}
-.check{display:flex;gap:8px;align-items:center;font-size:13px;color:#cbd0da}
-.check input{width:auto}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#b7f7ce}
-small{color:#aab2c2}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b10">
+  <title>Karina VulnScanner</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --panel: #11151e;
+      --border: #292d37;
+      --text: #f3f4f6;
+      --muted: #aab2c2;
+      --accent: #ff4057;
+      --green: #65e6a6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 20px 5%;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { font-size: 23px; font-weight: 800; }
+    .brand span { color: var(--accent); }
+    main { width: 92%; max-width: 1100px; margin: 32px auto; }
+    .panel, .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 16px;
+      min-width: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: 16px;
+    }
+    h1 { font-size: clamp(25px, 5vw, 36px); }
+    p { color: var(--muted); line-height: 1.7; }
+    label { display: block; margin: 14px 0 7px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg);
+      color: white;
+      border: 1px solid #343b4b;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      background: var(--accent);
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .5; cursor: wait; }
+    .check {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      color: #cbd0da;
+    }
+    .check input { width: auto; }
+    #status { color: var(--green); }
+    #result {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: #b7f7ce;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .nav a {
+      color: white;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    small { color: var(--muted); }
+  </style>
 </head>
 <body>
-<header><div class="brand">Karina <span>VulnScanner</span></div></header>
+<header>
+  <div class="brand">Karina <span>VulnScanner</span></div>
+</header>
+
 <main>
-<section class="panel">
-<p>SECURITY ANALYSIS PLATFORM</p>
-<h1>مركز الفحص الأمني</h1>
-<p>فحوصات إعدادات المواقع، ومنافذ TCP المحددة، وأنماط الأخطاء داخل ملفات الكود.</p>
-<div id="status">جارٍ التحقق من الخادم...</div>
-</section>
+  <section class="panel">
+    <p>SECURITY ANALYSIS PLATFORM</p>
+    <h1>مركز الفحص الأمني</h1>
+    <p>فحص ترويسات المواقع، ومنافذ TCP المحددة، وتحليل أنماط الأخطاء الأمنية في الكود.</p>
+    <div id="status">جارٍ التحقق من الخادم...</div>
+    <nav class="nav" aria-label="صفحات الفحص">
+      <a href="/scan/website">فحص المواقع</a>
+      <a href="/scan/network">فحص المنافذ</a>
+      <a href="/scan/code">تحليل الكود</a>
+      <a href="/reports">التقارير</a>
+    </nav>
+  </section>
 
-<section class="grid">
-<article class="card">
-<h2>فحص الموقع</h2>
-<p>مراجعة ترويسات HTTP وHTTPS الشائعة.</p>
-<form id="webForm">
-<label for="url">عنوان الموقع</label>
-<input id="url" name="url" type="url" placeholder="https://example.com" required>
-<label class="check"><input type="checkbox" name="authorized" value="true" required> أملك إذناً لفحص هذا الموقع</label>
-<button>ابدأ الفحص</button>
-</form>
-</article>
+  <section class="grid">
+    <article class="card">
+      <h2>فحص الموقع</h2>
+      <p>مراجعة ترويسات HTTP الأمنية لموقع تملك صلاحية فحصه.</p>
+      <form id="webForm">
+        <label for="url">عنوان الموقع</label>
+        <input id="url" type="url" placeholder="https://example.com" required maxlength="2048">
+        <label class="check">
+          <input id="webAuthorized" type="checkbox" required>
+          أملك إذناً لفحص هذا الموقع
+        </label>
+        <button type="submit">ابدأ الفحص</button>
+      </form>
+    </article>
 
-<article class="card">
-<h2>فحص المنافذ</h2>
-<p>يفحص قائمة محدودة من منافذ TCP المسموح بها.</p>
-<form id="networkForm">
-<label for="host">اسم المضيف أو IP عام</label>
-<input id="host" name="host" placeholder="example.com" required>
-<label for="ports">المنافذ (مفصولة بفاصلة)</label>
-<input id="ports" name="ports" value="80,443" required>
-<label class="check"><input type="checkbox" name="authorized" value="true" required> أملك إذناً لفحص هذا النظام</label>
-<button>افحص المنافذ</button>
-</form>
-</article>
+    <article class="card">
+      <h2>فحص المنافذ</h2>
+      <p>فحص منافذ TCP المحددة على نظام تملك صلاحية اختباره.</p>
+      <form id="networkForm">
+        <label for="host">اسم المضيف أو IP</label>
+        <input id="host" placeholder="example.com" required maxlength="253">
+        <label for="ports">المنافذ (مفصولة بفاصلة)</label>
+        <input id="ports" value="80,443" required>
+        <label class="check">
+          <input id="networkAuthorized" type="checkbox" required>
+          أملك إذناً لفحص هذا النظام
+        </label>
+        <button type="submit">افحص المنافذ</button>
+      </form>
+    </article>
 
-<article class="card">
-<h2>تحليل الكود</h2>
-<p>فحص نمطي لملف مصدر نصي لا يتجاوز 1MB.</p>
-<form id="codeForm">
-<label for="file">اختر ملف الكود</label>
-<input id="file" name="file" type="file" accept=".py,.js,.ts,.java,.php,.go,.txt" required>
-<label class="check"><input type="checkbox" name="authorized" value="true" required> لدي الحق بتحليل هذا الملف</label>
-<button>حلل الملف</button>
-</form>
-</article>
-</section>
+    <article class="card">
+      <h2>تحليل الكود</h2>
+      <p>تحليل نص ملف مصدر محلي بحثاً عن أنماط قد تستحق المراجعة. الحد الأقصى 1MB.</p>
+      <form id="codeForm">
+        <label for="file">اختر ملف الكود</label>
+        <input id="file" type="file" accept=".py,.js,.ts,.java,.php,.go,.txt" required>
+        <label class="check">
+          <input id="codeAuthorized" type="checkbox" required>
+          لدي الحق بتحليل هذا الملف
+        </label>
+        <button type="submit">حلل الملف</button>
+      </form>
+    </article>
+  </section>
 
-<section class="card">
-<h2>نتيجة الفحص</h2>
-<pre id="result">لم يبدأ أي فحص بعد.</pre>
-<button id="download" type="button">تنزيل التقرير JSON</button>
-<small>النتائج مؤشرات أولية وليست إثباتاً قاطعاً لوجود ثغرة.</small>
-</section>
+  <section class="card">
+    <h2>نتيجة الفحص</h2>
+    <pre id="result">لم يبدأ أي فحص بعد.</pre>
+    <button id="download" type="button">تنزيل التقرير JSON</button>
+    <small>النتائج مؤشرات أولية وليست إثباتاً قاطعاً لوجود ثغرة.</small>
+  </section>
 </main>
+
 <script>
+"use strict";
+
 let lastReport = null;
 
-async function submitScan(form, endpoint) {
-  const button = form.querySelector("button");
-  const result = document.getElementById("result");
+const resultElement = document.getElementById("result");
+
+async function sendJSON(endpoint, payload, button) {
   button.disabled = true;
-  result.textContent = "جارٍ تنفيذ الفحص...";
+  resultElement.textContent = "جارٍ تنفيذ الفحص...";
+  lastReport = null;
+
   try {
     const response = await fetch(endpoint, {
       method: "POST",
-      body: new FormData(form)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || "فشل الطلب");
+
+    const raw = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      throw new Error("الخادم رجّع استجابة غير صالحة بصيغة JSON.");
+    }
+
+    if (!response.ok) {
+      const detail = typeof data.detail === "string"
+        ? data.detail
+        : JSON.stringify(data.detail || data);
+      throw new Error("HTTP " + response.status + ": " + detail);
+    }
+
     lastReport = data;
-    result.textContent = JSON.stringify(data, null, 2);
+    resultElement.textContent = JSON.stringify(data, null, 2);
   } catch (error) {
-    result.textContent = "خطأ: " + error.message;
+    resultElement.textContent = "تعذر تنفيذ الفحص:\n" + error.message;
   } finally {
     button.disabled = false;
   }
 }
 
-document.getElementById("webForm").addEventListener("submit", e => {
-  e.preventDefault();
-  submitScan(e.target, "/api/scan/website");
+document.getElementById("webForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+
+  sendJSON("/api/scan/website", {
+    url: document.getElementById("url").value.trim(),
+    authorized: document.getElementById("webAuthorized").checked
+  }, form.querySelector("button"));
 });
-document.getElementById("networkForm").addEventListener("submit", e => {
-  e.preventDefault();
-  submitScan(e.target, "/api/scan/network");
+
+document.getElementById("networkForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+
+  const rawPorts = document.getElementById("ports").value.trim();
+  const parts = rawPorts.split(",").map(value => value.trim());
+
+  if (!parts.length || parts.some(value => !/^\d+$/.test(value))) {
+    resultElement.textContent = "اكتب المنافذ كأرقام مفصولة بفاصلة، مثال: 80,443";
+    return;
+  }
+
+  const ports = parts.map(Number);
+
+  if (ports.length > 5 || ports.some(port => port < 1 || port > 65535)) {
+    resultElement.textContent = "أدخل من 1 إلى 5 منافذ، وكل منفذ بين 1 و65535.";
+    return;
+  }
+
+  sendJSON("/api/scan/network", {
+    host: document.getElementById("host").value.trim(),
+    ports,
+    authorized: document.getElementById("networkAuthorized").checked
+  }, form.querySelector("button"));
 });
-document.getElementById("codeForm").addEventListener("submit", e => {
-  e.preventDefault();
-  submitScan(e.target, "/api/scan/code");
+
+document.getElementById("codeForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+
+  const fileInput = document.getElementById("file");
+  const file = fileInput.files && fileInput.files[0];
+
+  if (!file) {
+    resultElement.textContent = "اختار ملف كود أولاً.";
+    return;
+  }
+
+  if (file.size > 1024 * 1024) {
+    resultElement.textContent = "حجم الملف أكبر من 1MB.";
+    return;
+  }
+
+  const button = form.querySelector("button");
+  button.disabled = true;
+  resultElement.textContent = "جارٍ قراءة الملف...";
+
+  try {
+    const code = await file.text();
+
+    await sendJSON("/api/scan/code", {
+      code,
+      filename: file.name,
+      authorized: document.getElementById("codeAuthorized").checked
+    }, button);
+  } catch (error) {
+    resultElement.textContent = "تعذرت قراءة الملف: " + error.message;
+    button.disabled = false;
+  }
 });
 
 document.getElementById("download").addEventListener("click", () => {
   if (!lastReport) {
-    document.getElementById("result").textContent = "نفّذ فحصاً أولاً حتى تنشئ تقريراً.";
+    resultElement.textContent = "نفّذ فحصاً ناجحاً أولاً حتى تتمكن من تنزيل نتيجته.";
     return;
   }
-  const blob = new Blob([JSON.stringify(lastReport, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "karina-vulnscanner-report.json";
-  a.click();
-  URL.revokeObjectURL(url);
+
+  const blob = new Blob(
+    [JSON.stringify(lastReport, null, 2)],
+    { type: "application/json;charset=utf-8" }
+  );
+  const objectURL = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectURL;
+  link.download = "karina-vulnscanner-report.json";
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(objectURL), 1000);
 });
 
 fetch("/api/health")
-  .then(r => r.json())
-  .then(data => document.getElementById("status").textContent = "● الخادم متصل — " + data.version)
-  .catch(() => document.getElementById("status").textContent = "تعذر الاتصال بالخادم");
+  .then(async response => {
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    return response.json();
+  })
+  .then(data => {
+    document.getElementById("status").textContent =
+      "● الخادم متصل — " + (data.service || data.version || data.status || "جاهز");
+  })
+  .catch(() => {
+    document.getElementById("status").textContent =
+      "تعذر الاتصال بالخادم. تأكد من تشغيل التطبيق.";
+  });
 </script>
 </body>
 </html>
-HTML

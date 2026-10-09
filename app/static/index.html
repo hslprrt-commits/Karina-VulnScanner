@@ -1,0 +1,140 @@
+cat > app/static/index.html <<'HTML'
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b10">
+<title>Karina VulnScanner</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090b10;color:#f3f4f6;font-family:Arial,sans-serif}
+header{padding:20px 5%;background:#11151e;border-bottom:1px solid #292d37}
+.brand{font-size:23px;font-weight:800}.brand span{color:#ff4057}
+main{max-width:1000px;width:92%;margin:32px auto}
+.panel,.card{background:#11151e;border:1px solid #292d37;border-radius:15px;padding:20px;margin-bottom:16px}
+h1{font-size:clamp(25px,5vw,36px)}p{color:#aab2c2;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+label{display:block;margin:14px 0 7px}
+input{width:100%;padding:12px;background:#090b10;color:white;border:1px solid #343b4b;border-radius:8px}
+button{width:100%;padding:12px;margin-top:12px;background:#f43f55;color:white;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;color:#cbd0da}
+.check input{width:auto}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#b7f7ce}
+small{color:#aab2c2}
+</style>
+</head>
+<body>
+<header><div class="brand">Karina <span>VulnScanner</span></div></header>
+<main>
+<section class="panel">
+<p>SECURITY ANALYSIS PLATFORM</p>
+<h1>مركز الفحص الأمني</h1>
+<p>فحوصات إعدادات المواقع، ومنافذ TCP المحددة، وأنماط الأخطاء داخل ملفات الكود.</p>
+<div id="status">جارٍ التحقق من الخادم...</div>
+</section>
+
+<section class="grid">
+<article class="card">
+<h2>فحص الموقع</h2>
+<p>مراجعة ترويسات HTTP وHTTPS الشائعة.</p>
+<form id="webForm">
+<label for="url">عنوان الموقع</label>
+<input id="url" name="url" type="url" placeholder="https://example.com" required>
+<label class="check"><input type="checkbox" name="authorized" value="true" required> أملك إذناً لفحص هذا الموقع</label>
+<button>ابدأ الفحص</button>
+</form>
+</article>
+
+<article class="card">
+<h2>فحص المنافذ</h2>
+<p>يفحص قائمة محدودة من منافذ TCP المسموح بها.</p>
+<form id="networkForm">
+<label for="host">اسم المضيف أو IP عام</label>
+<input id="host" name="host" placeholder="example.com" required>
+<label for="ports">المنافذ (مفصولة بفاصلة)</label>
+<input id="ports" name="ports" value="80,443" required>
+<label class="check"><input type="checkbox" name="authorized" value="true" required> أملك إذناً لفحص هذا النظام</label>
+<button>افحص المنافذ</button>
+</form>
+</article>
+
+<article class="card">
+<h2>تحليل الكود</h2>
+<p>فحص نمطي لملف مصدر نصي لا يتجاوز 1MB.</p>
+<form id="codeForm">
+<label for="file">اختر ملف الكود</label>
+<input id="file" name="file" type="file" accept=".py,.js,.ts,.java,.php,.go,.txt" required>
+<label class="check"><input type="checkbox" name="authorized" value="true" required> لدي الحق بتحليل هذا الملف</label>
+<button>حلل الملف</button>
+</form>
+</article>
+</section>
+
+<section class="card">
+<h2>نتيجة الفحص</h2>
+<pre id="result">لم يبدأ أي فحص بعد.</pre>
+<button id="download" type="button">تنزيل التقرير JSON</button>
+<small>النتائج مؤشرات أولية وليست إثباتاً قاطعاً لوجود ثغرة.</small>
+</section>
+</main>
+<script>
+let lastReport = null;
+
+async function submitScan(form, endpoint) {
+  const button = form.querySelector("button");
+  const result = document.getElementById("result");
+  button.disabled = true;
+  result.textContent = "جارٍ تنفيذ الفحص...";
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: new FormData(form)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || "فشل الطلب");
+    lastReport = data;
+    result.textContent = JSON.stringify(data, null, 2);
+  } catch (error) {
+    result.textContent = "خطأ: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+document.getElementById("webForm").addEventListener("submit", e => {
+  e.preventDefault();
+  submitScan(e.target, "/api/scan/website");
+});
+document.getElementById("networkForm").addEventListener("submit", e => {
+  e.preventDefault();
+  submitScan(e.target, "/api/scan/network");
+});
+document.getElementById("codeForm").addEventListener("submit", e => {
+  e.preventDefault();
+  submitScan(e.target, "/api/scan/code");
+});
+
+document.getElementById("download").addEventListener("click", () => {
+  if (!lastReport) {
+    document.getElementById("result").textContent = "نفّذ فحصاً أولاً حتى تنشئ تقريراً.";
+    return;
+  }
+  const blob = new Blob([JSON.stringify(lastReport, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "karina-vulnscanner-report.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+fetch("/api/health")
+  .then(r => r.json())
+  .then(data => document.getElementById("status").textContent = "● الخادم متصل — " + data.version)
+  .catch(() => document.getElementById("status").textContent = "تعذر الاتصال بالخادم");
+</script>
+</body>
+</html>
+HTML

@@ -1,0 +1,141 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karina VulnScanner</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0c11;--panel:#151720;--line:#303443;--red:#ef4444;--muted:#a4a9b7}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top right,#35131b,transparent 45%),var(--bg);color:#f5f5f7;font:15px system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px 16px}
+header{padding:15px 0 25px;border-bottom:1px solid var(--line)}
+.brand{font-size:25px;font-weight:850}.brand b{color:var(--red)}
+h1{font-size:clamp(28px,5vw,42px);margin:32px 0 8px}
+p{color:var(--muted);line-height:1.8}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-top:25px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px}
+h2{font-size:18px}
+label{display:block;margin:14px 0 7px}
+input{width:100%;padding:12px;background:#0b0c11;color:white;border:1px solid #3b4050;border-radius:8px}
+.check{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px}
+.check input{width:auto}
+button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:8px;background:var(--red);color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+#results{display:none;margin-top:20px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;direction:ltr;text-align:left;background:#08090d;border:1px solid var(--line);padding:15px;border-radius:10px;max-height:550px;overflow:auto;font-size:12px}
+.notice{margin-top:20px;padding:13px;border:1px solid #705522;border-radius:10px;color:#f6d68a;font-size:13px;line-height:1.8}
+</style>
+</head>
+<body><main>
+<header><div class="brand"><b>Karina</b> VulnScanner</div><p>منصة الفحص الأمني الدفاعي</p></header>
+<h1>افحص. حلّل. أصلح.</h1>
+<p>فحوصات فعلية للمواقع والشبكات والكود. النتائج مؤشرات أمنية تحتاج تفسيراً، وليست كلها ثغرات مؤكدة.</p>
+
+<div class="grid">
+<section class="card">
+<h2>فحص موقع</h2>
+<label for="url">رابط الموقع</label>
+<input id="url" placeholder="https://example.com">
+<label class="check"><input id="wa" type="checkbox"> أملك الموقع أو لدي تصريح</label>
+<button onclick="scan('website',this)">بدء فحص الموقع</button>
+</section>
+
+<section class="card">
+<h2>فحص منافذ TCP</h2>
+<label for="host">المضيف العام</label>
+<input id="host" placeholder="example.com">
+<label for="ports">المنافذ المسموحة</label>
+<input id="ports" value="80,443,8080,8443">
+<label class="check"><input id="na" type="checkbox"> أملك الهدف أو لدي تصريح</label>
+<button onclick="scan('network',this)">فحص الشبكة</button>
+</section>
+
+<section class="card">
+<h2>تحليل الكود</h2>
+<label for="file">ملف نصي (حتى 1 ميغابايت)</label>
+<input id="file" type="file" accept=".py,.js,.ts,.tsx,.jsx,.java,.go,.php,.rb,.cs,.cpp,.c,.h,.yaml,.yml,.json,.txt,.sql">
+<label class="check"><input id="ca" type="checkbox"> أملك الكود أو لدي تصريح</label>
+<button onclick="scan('code',this)">تحليل الملف</button>
+</section>
+</div>
+
+<section id="results" class="card">
+<h2 id="heading">النتائج</h2>
+<p id="status">—</p>
+<button onclick="downloadReport()">تصدير JSON</button>
+<pre id="output"></pre>
+</section>
+
+<div class="notice">افحص الأنظمة المصرح لك بها فقط. هذه النسخة ترفض عناوين IP غير العامة، لكنها لا تُعدّ بديلاً عن مراجعة أمنية كاملة أو عن الحماية من جميع مخاطر SSRF في بيئة إنتاج.</div>
+</main>
+<script>
+let latest=null;
+async function request(path,options,title,button){
+ const old=button.textContent;
+ button.disabled=true;button.textContent="جارٍ الفحص...";
+ const panel=document.getElementById("results");
+ panel.style.display="block";
+ document.getElementById("heading").textContent=title;
+ document.getElementById("status").textContent="قيد التنفيذ...";
+ document.getElementById("output").textContent="";
+ try{
+  const response=await fetch(path,options);
+  const data=await response.json();
+  if(!response.ok)throw Error(data.detail||"فشل الطلب");
+  latest=data;
+  document.getElementById("status").textContent="اكتمل الطلب.";
+  document.getElementById("output").textContent=JSON.stringify(data,null,2);
+ }catch(e){
+  latest=null;
+  document.getElementById("status").textContent="تعذر إكمال الفحص";
+  document.getElementById("output").textContent=e.message;
+ }finally{
+  button.disabled=false;button.textContent=old;
+ }
+}
+function scan(type,button){
+ if(type==="website"){
+  if(!document.getElementById("wa").checked)return alert("أكد التصريح أولاً.");
+  return request("/api/scan/website",{
+   method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    url:document.getElementById("url").value.trim(),
+    authorized:true
+   })
+  },"نتيجة فحص الموقع",button);
+ }
+ if(type==="network"){
+  if(!document.getElementById("na").checked)return alert("أكد التصريح أولاً.");
+  const ports=document.getElementById("ports").value.split(",").map(x=>Number(x.trim()));
+  if(!ports.length||ports.length>12||ports.some(x=>!Number.isInteger(x)))return alert("تحقق من قائمة المنافذ.");
+  return request("/api/scan/network",{
+   method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    host:document.getElementById("host").value.trim(),
+    ports,authorized:true
+   })
+  },"نتيجة فحص الشبكة",button);
+ }
+ if(type==="code"){
+  if(!document.getElementById("ca").checked)return alert("أكد التصريح أولاً.");
+  const file=document.getElementById("file").files[0];
+  if(!file)return alert("اختر ملفاً أولاً.");
+  if(file.size>1000000)return alert("حجم الملف يتجاوز 1 ميغابايت.");
+  const form=new FormData();
+  form.append("file",file);
+  form.append("authorized","true");
+  return request("/api/scan/code",{method:"POST",body:form},"نتيجة تحليل الكود",button);
+ }
+}
+function downloadReport(){
+ if(!latest)return alert("لا توجد نتائج لتصديرها.");
+ const blob=new Blob([JSON.stringify(latest,null,2)],{type:"application/json"});
+ const a=document.createElement("a");
+ const url=URL.createObjectURL(blob);
+ a.href=url;a.download="karina-vulnscanner-report.json";a.click();
+ URL.revokeObjectURL(url);
+}
+</script>
+</body></html>

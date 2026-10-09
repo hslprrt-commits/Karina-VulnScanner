@@ -5,111 +5,334 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b10">
-  <title>Karina VulnScanner</title>
+  <title>Karina VulnScanner | مركز الفحص الأمني</title>
+
   <style>
     :root {
       color-scheme: dark;
       --bg: #090b10;
       --panel: #11151e;
-      --border: #292d37;
-      --text: #f3f4f6;
-      --muted: #aab2c2;
+      --panel2: #171d29;
+      --border: #292d3b;
+      --text: #f3f5f9;
+      --muted: #aab3c4;
       --accent: #ff4057;
       --green: #65e6a6;
+      --yellow: #ffd166;
+      --red: #ff697b;
+      --blue: #80baff;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse at top right, #25121c 0, transparent 40%),
+        var(--bg);
       color: var(--text);
       font-family: Arial, sans-serif;
+      line-height: 1.65;
     }
+
     header {
-      padding: 20px 5%;
-      background: var(--panel);
+      padding: 18px 5%;
+      background: rgba(17, 21, 30, .95);
       border-bottom: 1px solid var(--border);
     }
-    .brand { font-size: 23px; font-weight: 800; }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
     .brand span { color: var(--accent); }
-    main { width: 92%; max-width: 1100px; margin: 32px auto; }
-    .panel, .card {
-      background: var(--panel);
+
+    main {
+      width: min(1120px, 92%);
+      margin: 30px auto 60px;
+    }
+
+    .hero, .card {
+      background: rgba(17, 21, 30, .96);
       border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 16px;
+      border-radius: 17px;
+      padding: 22px;
+      margin-bottom: 18px;
       min-width: 0;
     }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+    }
+
+    h1 {
+      font-size: clamp(27px, 5vw, 40px);
+      line-height: 1.25;
+      margin: 10px 0;
+    }
+
+    h2 { font-size: 20px; margin-top: 0; }
+    h3 { font-size: 16px; }
+
+    p { color: var(--muted); }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 7px 12px;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--yellow);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .nav a {
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 13px;
+      border-radius: 9px;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .nav a:hover {
+      border-color: var(--accent);
+      background: #20151d;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr));
       gap: 16px;
     }
-    h1 { font-size: clamp(25px, 5vw, 36px); }
-    p { color: var(--muted); line-height: 1.7; }
-    label { display: block; margin: 14px 0 7px; }
-    input {
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-size: 14px;
+    }
+
+    input, textarea {
       width: 100%;
       padding: 12px;
       background: var(--bg);
-      color: white;
-      border: 1px solid #343b4b;
-      border-radius: 8px;
+      color: var(--text);
+      border: 1px solid #343d50;
+      border-radius: 9px;
+      font: inherit;
     }
+
+    input:focus, textarea:focus {
+      outline: 2px solid #ff405766;
+      border-color: var(--accent);
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--accent);
+    }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .check input { margin-top: 5px; }
+
     button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 15px;
+      margin-top: 13px;
       background: var(--accent);
       color: white;
-      border: 0;
-      border-radius: 8px;
+      font-size: 14px;
       font-weight: bold;
       cursor: pointer;
     }
-    button:disabled { opacity: .5; cursor: wait; }
-    .check {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 13px;
-      color: #cbd0da;
+
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
     }
-    .check input { width: auto; }
-    #status { color: var(--green); }
-    #result {
+
+    .primary { width: 100%; }
+
+    .secondary {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+    }
+
+    .result-empty {
+      padding: 20px;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .metric {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .metric small {
+      color: var(--muted);
+      display: block;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 4px;
+    }
+
+    .finding {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+
+    .finding-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .finding-title h3 { margin: 0; overflow-wrap: anywhere; }
+
+    .badge {
+      border-radius: 30px;
+      padding: 4px 9px;
+      font-size: 12px;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+    }
+
+    .ok { color: var(--green); }
+    .warn { color: var(--yellow); }
+    .bad { color: var(--red); }
+    .info { color: var(--blue); }
+
+    .recommendation {
+      background: #151d29;
+      border-right: 3px solid var(--blue);
+      padding: 10px 12px;
+      margin-top: 10px;
+      color: #dbe8fa;
+      font-size: 14px;
+    }
+
+    .explanation {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+
+    details { margin-top: 18px; }
+
+    summary {
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    pre {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-      color: #b7f7ce;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    .nav a {
-      color: white;
+      direction: ltr;
+      text-align: left;
+      background: var(--bg);
+      padding: 14px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 8px;
-      text-decoration: none;
+      color: #c8d7e8;
+      font-size: 12px;
+      overflow-x: auto;
     }
-    small { color: var(--muted); }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .actions button { flex: 1; min-width: 140px; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 20px;
+    }
+
+    @media (max-width: 480px) {
+      main { width: 94%; margin-top: 18px; }
+      .hero, .card { padding: 16px; }
+      .brand { font-size: 20px; }
+    }
   </style>
 </head>
+
 <body>
 <header>
   <div class="brand">Karina <span>VulnScanner</span></div>
 </header>
 
 <main>
-  <section class="panel">
-    <p>SECURITY ANALYSIS PLATFORM</p>
+  <section class="hero">
+    <div class="eyebrow">SECURITY ANALYSIS PLATFORM</div>
     <h1>مركز الفحص الأمني</h1>
-    <p>فحص ترويسات المواقع، ومنافذ TCP المحددة، وتحليل أنماط الأخطاء الأمنية في الكود.</p>
-    <div id="status">جارٍ التحقق من الخادم...</div>
-    <nav class="nav" aria-label="صفحات الفحص">
-      <a href="/scan/website">فحص المواقع</a>
-      <a href="/scan/network">فحص المنافذ</a>
-      <a href="/scan/code">تحليل الكود</a>
+    <p>
+      افحص إعدادات المواقع، واختبر منافذ الأنظمة المصرّح بها،
+      وحلّل ملفات الكود. ستحصل على شرح واضح للنتائج وتوصيات أولية.
+    </p>
+
+    <div class="status">
+      <span class="dot" id="statusDot"></span>
+      <span id="status">جارٍ التحقق من الخادم...</span>
+    </div>
+
+    <nav class="nav" aria-label="التنقل">
+      <a href="/">الرئيسية</a>
+      <a href="/scan/website">صفحة فحص المواقع</a>
+      <a href="/scan/network">صفحة فحص المنافذ</a>
+      <a href="/scan/code">صفحة تحليل الكود</a>
       <a href="/reports">التقارير</a>
     </nav>
   </section>
@@ -117,56 +340,87 @@
   <section class="grid">
     <article class="card">
       <h2>فحص الموقع</h2>
-      <p>مراجعة ترويسات HTTP الأمنية لموقع تملك صلاحية فحصه.</p>
+      <p>يفحص ترويسات الأمان في استجابة الموقع، ويشرح وظيفة كل ترويسة.</p>
+
       <form id="webForm">
         <label for="url">عنوان الموقع</label>
-        <input id="url" type="url" placeholder="https://example.com" required maxlength="2048">
+        <input id="url" type="url" placeholder="https://example.com"
+               maxlength="2048" required>
+
         <label class="check">
           <input id="webAuthorized" type="checkbox" required>
-          أملك إذناً لفحص هذا الموقع
+          <span>أملك إذناً لفحص هذا الموقع.</span>
         </label>
-        <button type="submit">ابدأ الفحص</button>
+
+        <button class="primary" type="submit">ابدأ فحص الموقع</button>
       </form>
     </article>
 
     <article class="card">
       <h2>فحص المنافذ</h2>
-      <p>فحص منافذ TCP المحددة على نظام تملك صلاحية اختباره.</p>
+      <p>يفحص قائمة محدودة من منافذ TCP على نظام تملك صلاحية اختباره.</p>
+
       <form id="networkForm">
         <label for="host">اسم المضيف أو IP</label>
-        <input id="host" placeholder="example.com" required maxlength="253">
-        <label for="ports">المنافذ (مفصولة بفاصلة)</label>
+        <input id="host" placeholder="example.com" maxlength="253" required>
+
+        <label for="ports">المنافذ، مفصولة بفاصلة</label>
         <input id="ports" value="80,443" required>
+
         <label class="check">
           <input id="networkAuthorized" type="checkbox" required>
-          أملك إذناً لفحص هذا النظام
+          <span>أملك إذناً لفحص هذا النظام.</span>
         </label>
-        <button type="submit">افحص المنافذ</button>
+
+        <button class="primary" type="submit">ابدأ فحص المنافذ</button>
       </form>
     </article>
 
     <article class="card">
       <h2>تحليل الكود</h2>
-      <p>تحليل نص ملف مصدر محلي بحثاً عن أنماط قد تستحق المراجعة. الحد الأقصى 1MB.</p>
+      <p>يبحث عن أنماط قد تشير إلى أسرار مكشوفة أو ممارسات برمجية خطرة.</p>
+
       <form id="codeForm">
-        <label for="file">اختر ملف الكود</label>
-        <input id="file" type="file" accept=".py,.js,.ts,.java,.php,.go,.txt" required>
+        <label for="file">اختر ملف المصدر</label>
+        <input id="file" type="file"
+               accept=".py,.js,.ts,.java,.php,.go,.txt"
+               required>
+
         <label class="check">
           <input id="codeAuthorized" type="checkbox" required>
-          لدي الحق بتحليل هذا الملف
+          <span>لدي الحق بتحليل هذا الملف.</span>
         </label>
-        <button type="submit">حلل الملف</button>
+
+        <button class="primary" type="submit">حلّل الكود</button>
       </form>
     </article>
   </section>
 
-  <section class="card">
-    <h2>نتيجة الفحص</h2>
-    <pre id="result">لم يبدأ أي فحص بعد.</pre>
-    <button id="download" type="button">تنزيل التقرير JSON</button>
-    <small>النتائج مؤشرات أولية وليست إثباتاً قاطعاً لوجود ثغرة.</small>
+  <section class="card" id="reportSection">
+    <h2>تقرير الفحص</h2>
+    <div id="result" class="result-empty" aria-live="polite">
+      ماكو فحص لحد الآن. اختار إحدى الأدوات أعلاه حتى تبدأ.
+    </div>
+
+    <div class="actions">
+      <button id="download" type="button" class="secondary">
+        تنزيل التقرير JSON
+      </button>
+      <button id="showRaw" type="button" class="secondary">
+        عرض البيانات الخام
+      </button>
+    </div>
+
+    <details id="rawDetails">
+      <summary>بيانات الاستجابة الخام (للمراجعة التقنية)</summary>
+      <pre id="rawResult">لا توجد بيانات بعد.</pre>
+    </details>
   </section>
 </main>
+
+<footer>
+  Karina VulnScanner — النتائج مؤشرات أولية وتحتاج مراجعة بشرية.
+</footer>
 
 <script>
 "use strict";
@@ -174,10 +428,268 @@
 let lastReport = null;
 
 const resultElement = document.getElementById("result");
+const rawResultElement = document.getElementById("rawResult");
 
-async function sendJSON(endpoint, payload, button) {
+const headerExplanations = {
+  "Content-Security-Policy": {
+    meaning: "تحدد مصادر المحتوى التي يُسمح للمتصفح بتحميلها، وتساعد على تقليل مخاطر بعض هجمات حقن المحتوى.",
+    advice: "راجع سياسة CSP مناسبة لمصادر السكربتات والصور والأنماط في موقعك. اختبرها أولاً بوضع Report-Only إذا احتجت تجنب تعطيل وظائف الموقع."
+  },
+  "Strict-Transport-Security": {
+    meaning: "تخبر المتصفح باستخدام HTTPS للموقع خلال الفترة المحددة في السياسة.",
+    advice: "إذا كان الموقع يعتمد HTTPS بالكامل، راجع قيمة max-age وسياسة النطاقات الفرعية قبل إضافة إعدادات أوسع."
+  },
+  "X-Content-Type-Options": {
+    meaning: "تساعد على منع المتصفح من تخمين نوع المحتوى بدلاً من الالتزام بنوعه المعلن.",
+    advice: "راجع إضافة X-Content-Type-Options: nosniff للاستجابات المناسبة."
+  },
+  "X-Frame-Options": {
+    meaning: "تساعد على التحكم بإمكانية عرض الصفحة داخل إطار في موقع آخر، لتقليل بعض هجمات النقر الخادع.",
+    advice: "راجع استخدام X-Frame-Options أو توجيه frame-ancestors ضمن CSP. قد تكون سياسة CSP كافية حتى لو لم تظهر هذه الترويسة."
+  },
+  "Referrer-Policy": {
+    meaning: "تحدد مقدار معلومات عنوان الصفحة التي يرسلها المتصفح ضمن Referer عند الانتقال إلى وجهة أخرى.",
+    advice: "راجع سياسة مثل strict-origin-when-cross-origin حسب احتياجات الخصوصية والتطبيق."
+  }
+};
+
+function addText(parent, tag, text, className) {
+  const element = document.createElement(tag);
+  element.textContent = String(text ?? "");
+  if (className) element.className = className;
+  parent.appendChild(element);
+  return element;
+}
+
+function addFinding(parent, title, status, explanation, advice, kind) {
+  const box = document.createElement("article");
+  box.className = "finding";
+
+  const heading = document.createElement("div");
+  heading.className = "finding-title";
+
+  addText(heading, "h3", title);
+
+  const badge = addText(
+    heading,
+    "span",
+    status,
+    "badge " + (kind || "info")
+  );
+
+  box.appendChild(heading);
+
+  if (explanation) {
+    addText(box, "p", explanation, "explanation");
+  }
+
+  if (advice) {
+    addText(box, "div", "التوصية: " + advice, "recommendation");
+  }
+
+  parent.appendChild(box);
+}
+
+function addMetric(parent, label, value, kind) {
+  const box = document.createElement("div");
+  box.className = "metric";
+  addText(box, "small", label);
+  addText(box, "strong", value, kind || "");
+  parent.appendChild(box);
+}
+
+function renderWebsiteReport(data, container) {
+  const checks = Array.isArray(data.checks) ? data.checks : [];
+  const present = checks.filter(item => item.present === true).length;
+  const missing = checks.filter(item => item.present === false).length;
+
+  const metrics = document.createElement("div");
+  metrics.className = "summary";
+
+  addMetric(metrics, "حالة HTTP", data.http_status ?? "غير متوفرة");
+  addMetric(metrics, "الترويسات الموجودة", present, "ok");
+  addMetric(metrics, "الترويسات غير المكتشفة", missing, missing ? "warn" : "ok");
+  addMetric(metrics, "HTTPS", data.https ? "مفعّل" : "غير مفعّل",
+            data.https ? "ok" : "warn");
+
+  container.appendChild(metrics);
+
+  if (data.target) {
+    addText(container, "p", "الموقع المفحوص: " + data.target);
+  }
+
+  addText(container, "h3", "تفاصيل الترويسات الأمنية");
+
+  for (const check of checks) {
+    const info = headerExplanations[check.name] || {
+      meaning: "فحص وجود عنصر أمني في استجابة الموقع.",
+      advice: "راجع إعدادات الخادم والتطبيق قبل اتخاذ قرار."
+    };
+
+    const presentNow = check.present === true;
+
+    addFinding(
+      container,
+      check.name || "ترويسة غير معروفة",
+      presentNow ? "موجودة" : "لم تُكتشف",
+      info.meaning,
+      presentNow
+        ? "تأكد أيضاً من أن قيمة الترويسة صحيحة وملائمة، لأن مجرد وجودها لا يثبت جودة إعدادها."
+        : info.advice,
+      presentNow ? "ok" : "warn"
+    );
+  }
+
+  addFinding(
+    container,
+    "ترويسة Server",
+    data.server_header_present ? "موجودة" : "لم تُكتشف",
+    "ترويسة Server قد تكشف معلومات عن البرنامج الذي يستضيف الموقع.",
+    "إذا كانت موجودة، راجع إن كانت تكشف تفاصيل غير ضرورية. وجودها وحده لا يعني وجود ثغرة.",
+    "info"
+  );
+
+  addText(
+    container,
+    "p",
+    "الخلاصة: هذه نتيجة فحص أولي للترويسات. لا يمكن إثبات وجود ثغرة أو نفيها من هذه البيانات وحدها.",
+    "recommendation"
+  );
+}
+
+function renderNetworkReport(data, container) {
+  addText(container, "p", "الهدف المفحوص: " + (data.target || data.host || "غير محدد"));
+
+  const ports = Array.isArray(data.ports)
+    ? data.ports
+    : Array.isArray(data.results)
+      ? data.results
+      : null;
+
+  if (!ports) {
+    addText(
+      container,
+      "p",
+      "الخادم أعاد نتيجة الفحص، لكن شكل البيانات لا يحتوي على قائمة منافذ معروفة للواجهة. افتح البيانات الخام حتى نشوف تفاصيل الاستجابة.",
+      "explanation"
+    );
+    return;
+  }
+
+  const openCount = ports.filter(item =>
+    item.open === true || item.status === "open"
+  ).length;
+
+  const metrics = document.createElement("div");
+  metrics.className = "summary";
+  addMetric(metrics, "عدد النتائج", ports.length);
+  addMetric(metrics, "المنافذ المفتوحة", openCount, openCount ? "warn" : "ok");
+  container.appendChild(metrics);
+
+  for (const item of ports) {
+    const port = item.port ?? item.number ?? "غير معروف";
+    const isOpen = item.open === true || item.status === "open";
+    addFinding(
+      container,
+      "منفذ TCP " + port,
+      isOpen ? "مفتوح" : (item.status || "غير مفتوح حسب النتيجة"),
+      isOpen
+        ? "الخدمة قد تكون متاحة عبر هذا المنفذ، لكن ذلك لا يثبت وجود ثغرة."
+        : "لم يُصنّف هذا المنفذ على أنه مفتوح في النتيجة المستلمة.",
+      "تحقق من أن الخدمة مطلوبة، وحدّ الوصول إليها بحسب حاجة النظام.",
+      isOpen ? "warn" : "info"
+    );
+  }
+}
+
+function renderCodeReport(data, container) {
+  const findings = Array.isArray(data.findings)
+    ? data.findings
+    : Array.isArray(data.issues)
+      ? data.issues
+      : Array.isArray(data.results)
+        ? data.results
+        : null;
+
+  if (!findings) {
+    addText(
+      container,
+      "p",
+      "تم استلام استجابة تحليل الكود، لكن شكل النتائج غير معروف بعد. راجع البيانات الخام لمعرفة الحقول التي يعيدها الخادم.",
+      "explanation"
+    );
+    return;
+  }
+
+  const metrics = document.createElement("div");
+  metrics.className = "summary";
+  addMetric(metrics, "عدد النتائج", findings.length);
+  container.appendChild(metrics);
+
+  if (!findings.length) {
+    addFinding(
+      container,
+      "نتيجة التحليل",
+      "لم تُكتشف أنماط مطابقة",
+      "لم يعثر الفحص النمطي على الأنماط التي يبحث عنها.",
+      "هذا لا يثبت أن الكود خالٍ من الثغرات؛ الفحص النمطي محدود وقد يفوّت أخطاء أخرى.",
+      "ok"
+    );
+    return;
+  }
+
+  for (const finding of findings) {
+    const title = finding.title || finding.name || finding.type || "مؤشر أمني";
+    const description = finding.description || finding.message || finding.detail ||
+      "اكتشف المحلل نمطاً يحتاج إلى مراجعة.";
+    const advice = finding.recommendation || finding.advice ||
+      "راجع السياق البرمجي قبل إجراء أي تعديل.";
+    const severity = finding.severity || finding.level || "غير محددة";
+
+    addFinding(
+      container,
+      title,
+      "الخطورة: " + severity,
+      description,
+      advice,
+      severity === "high" || severity === "critical" ? "bad" : "warn"
+    );
+  }
+}
+
+function renderReport(data, type) {
+  resultElement.replaceChildren();
+
+  addText(resultElement, "h2", "نتيجة الفحص");
+  addText(
+    resultElement,
+    "p",
+    "معرّف التقرير: " + (data.report_id || data.id || "غير متوفر"),
+    "explanation"
+  );
+
+  if (type === "website") {
+    renderWebsiteReport(data, resultElement);
+  } else if (type === "network") {
+    renderNetworkReport(data, resultElement);
+  } else if (type === "code") {
+    renderCodeReport(data, resultElement);
+  } else {
+    addText(
+      resultElement,
+      "p",
+      "تم استلام التقرير، لكن نوعه غير معروف للواجهة.",
+      "explanation"
+    );
+  }
+
+  rawResultElement.textContent = JSON.stringify(data, null, 2);
+}
+
+async function sendJSON(endpoint, payload, button, type) {
   button.disabled = true;
-  resultElement.textContent = "جارٍ تنفيذ الفحص...";
+  resultElement.replaceChildren();
+  addText(resultElement, "p", "جارٍ تنفيذ الفحص، انتظر...");
   lastReport = null;
 
   try {
@@ -193,20 +705,27 @@ async function sendJSON(endpoint, payload, button) {
     try {
       data = JSON.parse(raw);
     } catch {
-      throw new Error("الخادم رجّع استجابة غير صالحة بصيغة JSON.");
+      throw new Error("الخادم أعاد استجابة غير صالحة بصيغة JSON.");
     }
 
     if (!response.ok) {
-      const detail = typeof data.detail === "string"
-        ? data.detail
-        : JSON.stringify(data.detail || data);
+      let detail = data.detail || data.message || "حدث خطأ غير معروف";
+      if (typeof detail !== "string") detail = JSON.stringify(detail);
       throw new Error("HTTP " + response.status + ": " + detail);
     }
 
-    lastReport = data;
-    resultElement.textContent = JSON.stringify(data, null, 2);
+    lastReport = { type, data };
+    renderReport(data, type);
   } catch (error) {
-    resultElement.textContent = "تعذر تنفيذ الفحص:\n" + error.message;
+    resultElement.replaceChildren();
+    addText(resultElement, "h3", "تعذر إكمال الفحص");
+    addText(resultElement, "p", error.message, "bad");
+    addText(
+      resultElement,
+      "p",
+      "تحقق من اتصال الخادم ومن تفاصيل الخطأ في Terminal.",
+      "explanation"
+    );
   } finally {
     button.disabled = false;
   }
@@ -214,95 +733,128 @@ async function sendJSON(endpoint, payload, button) {
 
 document.getElementById("webForm").addEventListener("submit", event => {
   event.preventDefault();
+
   const form = event.currentTarget;
   if (!form.reportValidity()) return;
 
-  sendJSON("/api/scan/website", {
-    url: document.getElementById("url").value.trim(),
-    authorized: document.getElementById("webAuthorized").checked
-  }, form.querySelector("button"));
+  sendJSON(
+    "/api/scan/website",
+    {
+      url: document.getElementById("url").value.trim(),
+      authorized: document.getElementById("webAuthorized").checked
+    },
+    form.querySelector("button"),
+    "website"
+  );
 });
 
 document.getElementById("networkForm").addEventListener("submit", event => {
   event.preventDefault();
+
   const form = event.currentTarget;
   if (!form.reportValidity()) return;
 
-  const rawPorts = document.getElementById("ports").value.trim();
-  const parts = rawPorts.split(",").map(value => value.trim());
+  const pieces = document.getElementById("ports").value
+    .split(",")
+    .map(item => item.trim());
 
-  if (!parts.length || parts.some(value => !/^\d+$/.test(value))) {
-    resultElement.textContent = "اكتب المنافذ كأرقام مفصولة بفاصلة، مثال: 80,443";
+  if (!pieces.length || pieces.some(item => !/^\d+$/.test(item))) {
+    resultElement.replaceChildren();
+    addText(resultElement, "p", "اكتب المنافذ بأرقام مفصولة بفاصلة، مثل 80,443.", "warn");
     return;
   }
 
-  const ports = parts.map(Number);
+  const ports = pieces.map(Number);
 
   if (ports.length > 5 || ports.some(port => port < 1 || port > 65535)) {
-    resultElement.textContent = "أدخل من 1 إلى 5 منافذ، وكل منفذ بين 1 و65535.";
+    resultElement.replaceChildren();
+    addText(resultElement, "p", "أدخل من منفذ واحد إلى خمسة منافذ صحيحة بين 1 و65535.", "warn");
     return;
   }
 
-  sendJSON("/api/scan/network", {
-    host: document.getElementById("host").value.trim(),
-    ports,
-    authorized: document.getElementById("networkAuthorized").checked
-  }, form.querySelector("button"));
+  sendJSON(
+    "/api/scan/network",
+    {
+      host: document.getElementById("host").value.trim(),
+      ports,
+      authorized: document.getElementById("networkAuthorized").checked
+    },
+    form.querySelector("button"),
+    "network"
+  );
 });
 
 document.getElementById("codeForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   const form = event.currentTarget;
   if (!form.reportValidity()) return;
 
-  const fileInput = document.getElementById("file");
-  const file = fileInput.files && fileInput.files[0];
+  const file = document.getElementById("file").files[0];
 
   if (!file) {
-    resultElement.textContent = "اختار ملف كود أولاً.";
+    resultElement.replaceChildren();
+    addText(resultElement, "p", "اختار ملف كود أولاً.", "warn");
     return;
   }
 
   if (file.size > 1024 * 1024) {
-    resultElement.textContent = "حجم الملف أكبر من 1MB.";
+    resultElement.replaceChildren();
+    addText(resultElement, "p", "حجم الملف يتجاوز الحد الأقصى 1MB.", "warn");
     return;
   }
 
   const button = form.querySelector("button");
   button.disabled = true;
-  resultElement.textContent = "جارٍ قراءة الملف...";
 
   try {
     const code = await file.text();
 
-    await sendJSON("/api/scan/code", {
-      code,
-      filename: file.name,
-      authorized: document.getElementById("codeAuthorized").checked
-    }, button);
+    await sendJSON(
+      "/api/scan/code",
+      {
+        code,
+        filename: file.name,
+        authorized: document.getElementById("codeAuthorized").checked
+      },
+      button,
+      "code"
+    );
   } catch (error) {
-    resultElement.textContent = "تعذرت قراءة الملف: " + error.message;
+    resultElement.replaceChildren();
+    addText(resultElement, "p", "تعذرت قراءة الملف: " + error.message, "bad");
+  } finally {
     button.disabled = false;
   }
 });
 
 document.getElementById("download").addEventListener("click", () => {
   if (!lastReport) {
-    resultElement.textContent = "نفّذ فحصاً ناجحاً أولاً حتى تتمكن من تنزيل نتيجته.";
+    resultElement.replaceChildren();
+    addText(resultElement, "p", "نفّذ فحصاً ناجحاً أولاً حتى تنزّل التقرير.", "warn");
     return;
   }
 
   const blob = new Blob(
-    [JSON.stringify(lastReport, null, 2)],
+    [JSON.stringify(lastReport.data, null, 2)],
     { type: "application/json;charset=utf-8" }
   );
-  const objectURL = URL.createObjectURL(blob);
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href = objectURL;
-  link.download = "karina-vulnscanner-report.json";
+  link.href = url;
+  link.download = "karina-vulnscanner-" + lastReport.type + "-report.json";
   link.click();
 
-  setTimeout(() => URL.revokeObjectURL(objectURL), 1000);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+document.getElementById("showRaw").addEventListener("click", () => {
+  const details = document.getElementById("rawDetails");
+  details.open = !details.open;
+  if (details.open) {
+    details.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 });
 
 fetch("/api/health")
@@ -312,11 +864,14 @@ fetch("/api/health")
   })
   .then(data => {
     document.getElementById("status").textContent =
-      "● الخادم متصل — " + (data.service || data.version || data.status || "جاهز");
+      "الخادم متصل — " +
+      (data.service || data.version || data.status || "جاهز");
+    document.getElementById("statusDot").style.background = "var(--green)";
   })
   .catch(() => {
     document.getElementById("status").textContent =
-      "تعذر الاتصال بالخادم. تأكد من تشغيل التطبيق.";
+      "تعذر الاتصال بالخادم";
+    document.getElementById("statusDot").style.background = "var(--red)";
   });
 </script>
 </body>
